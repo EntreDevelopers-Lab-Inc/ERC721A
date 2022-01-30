@@ -22,7 +22,7 @@ import '@openzeppelin/contracts/utils/introspection/ERC165.sol';
  *
  * Assumes that an owner cannot have more than the 2**128 (max value of uint128) of supply
  */
-contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable {
+contract Avvenire is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable {
     using Address for address;
     using Strings for uint256;
 
