@@ -11,13 +11,16 @@ import './extensions/ERC721AOwnersExplicit.sol';
 
 contract AvvenireCollection is ERC721A, Ownable, ERC721AOwnersExplicit {
     uint256 maxSupply;
+    uint256 maxBatch;
 
     constructor(
         string memory name_,
         string memory symbol_,
-        uint256 maxSupply_
+        uint256 maxSupply_,
+        uint256 maxBatch_
     ) ERC721A(name_, symbol_) Ownable() {
         maxSupply = maxSupply_;
+        maxBatch = maxBatch_;
     }
 
     function numberMinted(address owner) public view returns (uint256) {
@@ -44,7 +47,7 @@ contract AvvenireCollection is ERC721A, Ownable, ERC721AOwnersExplicit {
      * @dev Modifier to guarantee that mint quantity cannot exceed the max supply
      */
     modifier belowMaxSupply(uint256 quantity) {
-        require(currentIndex < (maxSupply - quantity));
+        require(currentIndex < (maxSupply - quantity), 'Mint quantity will exceed max supply');
         _;
     }
 
@@ -52,7 +55,7 @@ contract AvvenireCollection is ERC721A, Ownable, ERC721AOwnersExplicit {
      * @dev see ERC721A. Added belowMaxSupply modifier
      */
     function safeMint(address to, uint256 quantity) public belowMaxSupply(quantity) {
-        require(currentIndex < maxSupply - quantity);
+        require(quantity <= maxBatch, 'mint quantity exceeds max batch');
         _safeMint(to, quantity);
     }
 
@@ -64,9 +67,15 @@ contract AvvenireCollection is ERC721A, Ownable, ERC721AOwnersExplicit {
         uint256 quantity,
         bytes memory _data
     ) public belowMaxSupply(quantity) {
+        require(quantity <= maxBatch, 'mint quantity exceeds max batch');
         _safeMint(to, quantity, _data);
     }
 
+    /**
+     * @dev see ERC721AOwnersExplicit.sol and ERC721A.sol
+     * function _setOwnersExplicit() adds addresses to blank spots in _addressData mapping
+     * this subsequently eliminates the loops in the ownerOf() function
+     */
     function setOwnersExplicit(uint256 quantity) public onlyOwner {
         _setOwnersExplicit(quantity);
     }
