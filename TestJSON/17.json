@@ -1,0 +1,12 @@
+{
+    "name": "Number 17",
+    "description": "Picture of number 17",
+    "images": "https://ipfs.io/ipfs/{cid}/17.jpg",
+    "attributes": [
+        {
+            "trait_type": "Rank",
+            "value": 17,
+            "max_value": 30
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "name": "Number 2",
+    "description": "Picture of number 2",
+    "images": "https://ipfs.io/ipfs/{cid}/2.jpg",
+    "attributes": [
+        {
+            "trait_type": "Rank",
+            "value": 2,
+            "max_value": 30
+        }
+    ]
+}
