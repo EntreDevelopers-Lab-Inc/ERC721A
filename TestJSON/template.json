@@ -1,7 +1,7 @@
 {
     "name": "Number #",
     "description": "Picture of number E",
-    "images": "https://ipfs.io/ipfs/{cid}/<#>.jpg",
+    "images": "https://ipfs.io/ipfs/<CID>/<#>.jpg",
     "attributes": [
         {
             "trait_type": "Rank",

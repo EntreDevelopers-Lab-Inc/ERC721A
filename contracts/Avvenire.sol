@@ -10,7 +10,15 @@ import '@openzeppelin/contracts/utils/Strings.sol';
 import './extensions/ERC721AOwnersExplicit.sol';
 
 contract AvvenireCollection is ERC721A, Ownable, ERC721AOwnersExplicit {
-    constructor(string memory name_, string memory symbol_) ERC721A(name_, symbol_) {}
+    uint256 maxSupply;
+
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        uint256 maxSupply_
+    ) ERC721A(name_, symbol_) Ownable() {
+        maxSupply = maxSupply_;
+    }
 
     function numberMinted(address owner) public view returns (uint256) {
         return _numberMinted(owner);
@@ -25,22 +33,37 @@ contract AvvenireCollection is ERC721A, Ownable, ERC721AOwnersExplicit {
      * Base URI for computing {tokenURI}. If set, the resulting URI for
      */
     function _baseURI() internal view override returns (string memory) {
-        return '';
+        return 'https://ipfs.io/ipfs/QmXuxG21RtEbga9xk3c2ancUnQv2DppUnyEf6XzEBGd9ZP/3.jpg';
     }
 
     function exists(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);
     }
 
-    function safeMint(address to, uint256 quantity) public {
+    /**
+     * @dev Modifier to guarantee that mint quantity cannot exceed the max supply
+     */
+    modifier belowMaxSupply(uint256 quantity) {
+        require(currentIndex < (maxSupply - quantity));
+        _;
+    }
+
+    /**
+     * @dev see ERC721A. Added belowMaxSupply modifier
+     */
+    function safeMint(address to, uint256 quantity) public belowMaxSupply(quantity) {
+        require(currentIndex < maxSupply - quantity);
         _safeMint(to, quantity);
     }
 
+    /**
+     * @dev see ERC721A. Added belowMaxSupply modifier
+     */
     function safeMint(
         address to,
         uint256 quantity,
         bytes memory _data
-    ) public {
+    ) public belowMaxSupply(quantity) {
         _safeMint(to, quantity, _data);
     }
 
