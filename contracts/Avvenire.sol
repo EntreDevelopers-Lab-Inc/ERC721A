@@ -46,28 +46,27 @@ contract AvvenireCollection is ERC721A, Ownable, ERC721AOwnersExplicit {
     /**
      * @dev Modifier to guarantee that mint quantity cannot exceed the max supply
      */
-    modifier belowMaxSupply(uint256 quantity) {
+    modifier properMint(uint256 quantity) {
         require(currentIndex < (maxSupply - quantity), 'Mint quantity will exceed max supply');
+        require(quantity <= maxBatch, 'Mint quantity exceeds max batch');
         _;
     }
 
     /**
-     * @dev see ERC721A. Added belowMaxSupply modifier
+     * @dev see ERC721A. Added properMint modifier
      */
-    function safeMint(address to, uint256 quantity) public belowMaxSupply(quantity) {
-        require(quantity <= maxBatch, 'mint quantity exceeds max batch');
+    function safeMint(address to, uint256 quantity) public properMint(quantity) {
         _safeMint(to, quantity);
     }
 
     /**
-     * @dev see ERC721A. Added belowMaxSupply modifier
+     * @dev see ERC721A. Added properMint modifier
      */
     function safeMint(
         address to,
         uint256 quantity,
         bytes memory _data
-    ) public belowMaxSupply(quantity) {
-        require(quantity <= maxBatch, 'mint quantity exceeds max batch');
+    ) public properMint(quantity) {
         _safeMint(to, quantity, _data);
     }
 
