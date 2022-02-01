@@ -3,25 +3,23 @@
 
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
+import '../node_modules/@openzeppelin/contracts/access/Ownable.sol';
+import '../node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import './ERC721A.sol';
-import '@openzeppelin/contracts/utils/Strings.sol';
+import '../node_modules/@openzeppelin/contracts/utils/Strings.sol';
 import './extensions/ERC721AOwnersExplicit.sol';
 
 contract AvvenireCollection is ERC721A, Ownable, ERC721AOwnersExplicit {
-    uint256 maxSupply;
-    uint256 maxBatch;
+    /**
+     * @dev Initialized over set in constructor. Optimizes on gas
+     * Max supply eventually needs to be set to 10000...
+     */
+    uint256 immutable maxSupply = 30;
+    uint256 immutable maxBatch = 10;
+    uint256 immutable whiteList_MaxBatch = 2;
+    uint256 immutable price = 0.1 ether;
 
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        uint256 maxSupply_,
-        uint256 maxBatch_
-    ) ERC721A(name_, symbol_) Ownable() {
-        maxSupply = maxSupply_;
-        maxBatch = maxBatch_;
-    }
+    constructor(string memory name_, string memory symbol_) ERC721A(name_, symbol_) Ownable() {}
 
     function numberMinted(address owner) public view returns (uint256) {
         return _numberMinted(owner);
@@ -45,17 +43,20 @@ contract AvvenireCollection is ERC721A, Ownable, ERC721AOwnersExplicit {
 
     /**
      * @dev Modifier to guarantee that mint quantity cannot exceed the max supply
+     * currentIndex starts at 0;
      */
     modifier properMint(uint256 quantity) {
-        require(currentIndex < (maxSupply - quantity), 'Mint quantity will exceed max supply');
+        require(quantity <= (maxSupply - currentIndex), 'Mint quantity will exceed max supply');
         require(quantity <= maxBatch, 'Mint quantity exceeds max batch');
+        require(msg.value >= price);
         _;
     }
 
     /**
      * @dev see ERC721A. Added properMint modifier
      */
-    function safeMint(address to, uint256 quantity) public properMint(quantity) {
+    function safeMint(address to, uint256 quantity) public payable properMint(quantity) {
+        //sendValue(owner,msg.value);
         _safeMint(to, quantity);
     }
 
@@ -66,7 +67,7 @@ contract AvvenireCollection is ERC721A, Ownable, ERC721AOwnersExplicit {
         address to,
         uint256 quantity,
         bytes memory _data
-    ) public properMint(quantity) {
+    ) public payable properMint(quantity) {
         _safeMint(to, quantity, _data);
     }
 
